@@ -65,9 +65,14 @@ export default function DurationPickerModal({
           />
           <Text style={[styles.label, { color: textColor }]}>{t('common.seconds_label')}</Text>
         </View>
-        <Pressable style={styles.button} onPress={onConfirm}>
-          <Text style={[styles.buttonText, { color: textColor }]}>{t('growth.start_focus_mode')}</Text>
-        </Pressable>
+        <View style={styles.buttonRow}>
+          <Pressable style={styles.button} onPress={onConfirm}>
+            <Text style={[styles.buttonText, { color: textColor }]}>{t('growth.start_focus_mode')}</Text>
+          </Pressable>
+          <Pressable style={styles.button} onPress={onClose}>
+            <Text style={[styles.buttonText, { color: textColor }]}>{t('growth.end')}</Text>
+          </Pressable>
+        </View>
       </Pressable>
     </Pressable>
   );
@@ -78,6 +83,7 @@ const styles = StyleSheet.create({
   container: { padding: 0, backgroundColor: 'transparent' },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 10 },
   label: { marginHorizontal: 5, fontSize: 16 },
-  button: { paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center', marginTop: 10 },
+  buttonRow: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 10 },
+  button: { paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center' },
   buttonText: { fontSize: 16, fontWeight: 'bold' },
 });
