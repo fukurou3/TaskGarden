@@ -25,7 +25,9 @@ export type CalendarScreenStyles = {
 
 export const createCalendarStyles = (isDark: boolean, subColor: string): CalendarScreenStyles => {
   const textColor = isDark ? '#FFFFFF' : '#000000';
-  const dynamicSubColor = subColor || (isDark ? '#4875B7' : '#2F5A8F');
+  const dynamicSubColor = subColor || '#8A7B64';
+  const darkBg = '#1a1a1d';
+  const lightBg = '#f4f4f6';
   const shadowStyle = {
     shadowColor: isDark ? '#000' : '#555',
     shadowOffset: { width: 0, height: 2 },
@@ -37,15 +39,15 @@ export const createCalendarStyles = (isDark: boolean, subColor: string): Calenda
   return StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
+        backgroundColor: isDark ? darkBg : lightBg,
     },
     appBar: {
         height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
+        backgroundColor: isDark ? darkBg : lightBg,
         borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: isDark ? '#3A3A3C' : '#D1D1D6',
+        borderBottomColor: isDark ? '#2c2c2e' : '#e0e0e3',
     },
     titleText: {
         fontSize: 20,
@@ -58,7 +60,7 @@ export const createCalendarStyles = (isDark: boolean, subColor: string): Calenda
         alignItems: 'center',
         paddingHorizontal: 12, // 左右の余白を調整
         paddingVertical: 8,
-        backgroundColor: isDark ? '#000000' : '#FFFFFF',
+        backgroundColor: isDark ? darkBg : '#FFFFFF',
     },
     monthText: {
         fontSize: 22,
@@ -89,9 +91,9 @@ export const createCalendarStyles = (isDark: boolean, subColor: string): Calenda
         color: '#FFFFFF',
     },
     calendarWrapper: {
-        backgroundColor: isDark ? '#000000' : '#FFFFFF',
+        backgroundColor: isDark ? darkBg : '#FFFFFF',
         borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: isDark ? '#202020' : '#888888',
+        borderTopColor: isDark ? '#2c2c2e' : '#ccccd0',
     },
     list: {
         flex: 1,
@@ -107,7 +109,7 @@ export const createCalendarStyles = (isDark: boolean, subColor: string): Calenda
     googleHeader: {
         padding: 12,
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? '#3A3A3C' : '#D1D1D6',
+        borderBottomColor: isDark ? '#2c2c2e' : '#e0e0e3',
         marginHorizontal: 12,
     },
     googleHeaderText: {

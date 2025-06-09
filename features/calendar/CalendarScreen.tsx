@@ -25,9 +25,9 @@ import { createCalendarStyles } from '@/features/calendar/styles';
 import { Ionicons } from '@expo/vector-icons';
 
 const CALENDAR_BG_KEY = '@calendar_background_id';
-const WEEKDAY_COLOR = '#888888';
-const SUNDAY_COLOR = '#FF6666';
-const SATURDAY_COLOR = '#66B2FF';
+const WEEKDAY_COLOR = '#999999';
+const SUNDAY_COLOR = '#D17878';
+const SATURDAY_COLOR = '#7894C4';
 // 曜日欄の高さに合わせて短くする
 const HEADER_HEIGHT = 24;
 const FULL_CELL_HEIGHT_FACTOR = 1.9;
@@ -259,8 +259,8 @@ export default function CalendarPage() {
                   day: textColor,
                   saturday: SATURDAY_COLOR,
                   sunday: SUNDAY_COLOR,
-                  line: isDark ? '#303030' : '#B0B0B5',
-                  background: isDark ? '#000000' : '#FFFFFF',
+                  line: isDark ? '#2C2C2E' : '#C0C0C5',
+                  background: isDark ? '#1a1a1d' : '#f4f4f6',
                   eventText: '#FFFFFF',
                 }}
               />
@@ -281,8 +281,8 @@ export default function CalendarPage() {
                   day: textColor,
                   saturday: SATURDAY_COLOR,
                   sunday: SUNDAY_COLOR,
-                  line: isDark ? '#303030' : '#B0B0B5',
-                  background: isDark ? '#000000' : '#FFFFFF',
+                  line: isDark ? '#2C2C2E' : '#C0C0C5',
+                  background: isDark ? '#1a1a1d' : '#f4f4f6',
                   eventText: '#FFFFFF',
                 }}
               />
@@ -303,8 +303,8 @@ export default function CalendarPage() {
                   day: textColor,
                   saturday: SATURDAY_COLOR,
                   sunday: SUNDAY_COLOR,
-                  line: isDark ? '#303030' : '#B0B0B5',
-                  background: isDark ? '#000000' : '#FFFFFF',
+                  line: isDark ? '#2C2C2E' : '#C0C0C5',
+                  background: isDark ? '#1a1a1d' : '#f4f4f6',
                   eventText: '#FFFFFF',
                 }}
               />
