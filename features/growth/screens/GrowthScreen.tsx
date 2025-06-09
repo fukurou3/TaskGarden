@@ -10,6 +10,7 @@ import { useGrowth } from '../hooks/useGrowth';
 import { GROWTH_THRESHOLDS, GROWTH_POINTS_PER_FOCUS_MINUTE } from '../themes'; // GROWTH_POINTS_PER_FOCUS_MINUTE を追加
 import { Theme, GrowthStage } from '../themes/types'; // types.tsからThemeとGrowthStageを直接インポート
 import { useFocusEffect, useRouter, useLocalSearchParams } from 'expo-router';
+// Expo Go (SDK 53+) no longer supports remote notifications. Use a dev build.
 import * as Notifications from 'expo-notifications';
 import GrowthDisplay from '../components/GrowthDisplay';
 import ThemeSelectionModal from '../components/ThemeSelectionModal';

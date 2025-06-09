@@ -4,7 +4,7 @@ import React from 'react';
 // we can use this to determine if we're on the server or not.
 export function useClientOnlyValue<S, C>(server: S, client: C): S | C {
   const [value, setValue] = React.useState<S | C>(server);
-  const lastClientRef = React.useRef(client);
+  const lastClientRef = React.useRef<C | null>(null);
 
   React.useEffect(() => {
     if (lastClientRef.current !== client) {
