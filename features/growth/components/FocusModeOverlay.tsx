@@ -94,7 +94,7 @@ export default function FocusModeOverlay({
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={onStop} style={styles.controlButton}>
-            <Ionicons name="stop" size={40} color="#fff" />
+            <Ionicons name="reload" size={40} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
