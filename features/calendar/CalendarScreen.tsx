@@ -5,7 +5,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { getItem } from '@/lib/Storage';
 import TasksDatabase from '@/lib/TaskDatabase';
 import { Gesture, GestureDetector, Directions } from 'react-native-gesture-handler';
-import { useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
+import Animated, { useSharedValue, withTiming, runOnJS, useAnimatedStyle, Easing } from 'react-native-reanimated';
 import PagerView, { type PagerViewOnPageSelectedEvent } from 'react-native-pager-view';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -40,7 +40,6 @@ export default function CalendarPage() {
   const router = useRouter();
 
   const { enabled: googleEnabled } = useGoogleCalendarSync();
-  const { width } = useWindowDimensions();
 
   const [displayMonth, setDisplayMonth] = useState(dayjs());
   const [backgroundImage, setBackgroundImage] = useState<number | null>(null);
@@ -55,19 +54,33 @@ export default function CalendarPage() {
 
   const { events: googleAllEvents, loading: googleLoading } = useGoogleCalendarAllEvents(googleEnabled);
 
-  const calendarHeight = useMemo(() => {
-    const PADDING = 0;
-    const calendarWidth = width - PADDING * 2;
-    const cellWidth = calendarWidth / 7;
-    const cellHeight = viewType === 'full' ? cellWidth * FULL_CELL_HEIGHT_FACTOR : cellWidth;
+  // --- 変更点：カレンダーの高さをアニメーション用に再定義 ---
+  const { width } = useWindowDimensions();
+  const listCellHeight = useMemo(() => (width - 0 * 2) / 7, [width]); // PADDINGは0
+  const fullCellHeight = useMemo(() => listCellHeight * FULL_CELL_HEIGHT_FACTOR, [listCellHeight]);
 
-    const firstDayOfMonth = displayMonth.startOf('month');
-    const daysInMonth = displayMonth.daysInMonth();
+  const getCalendarHeight = useCallback((type: 'list' | 'full', month: dayjs.Dayjs) => {
+    const cellH = type === 'full' ? fullCellHeight : listCellHeight;
+    const firstDayOfMonth = month.startOf('month');
+    const daysInMonth = month.daysInMonth();
     const startDayOfWeek = firstDayOfMonth.day();
     const numRows = Math.ceil((startDayOfWeek + daysInMonth) / 7);
+    return HEADER_HEIGHT + cellH * numRows;
+  }, [listCellHeight, fullCellHeight]);
 
-    return HEADER_HEIGHT + cellHeight * numRows;
-  }, [width, viewType, displayMonth]);
+  const calendarHeight = useSharedValue(getCalendarHeight('list', displayMonth));
+
+  // displayMonthやviewTypeが変わった時にも高さを更新
+  useEffect(() => {
+    calendarHeight.value = withTiming(getCalendarHeight(viewType, displayMonth), { duration: 300 });
+  }, [displayMonth, viewType, getCalendarHeight, calendarHeight]);
+  
+  const animatedCalendarStyle = useAnimatedStyle(() => {
+    return {
+      height: calendarHeight.value,
+    };
+  });
+  // ----------------------------------------------------
 
   useFocusEffect(
     useCallback(() => {
@@ -103,7 +116,6 @@ export default function CalendarPage() {
     return eventCache[key] || processMultiDayEvents(allMonthEvents, displayMonth);
   }, [eventCache, allMonthEvents, displayMonth]);
 
-  // キャッシュに存在しない月のレイアウトのみを生成
   useEffect(() => {
     const key = displayMonth.format('YYYY-MM');
     if (!eventCache[key]) {
@@ -128,15 +140,6 @@ export default function CalendarPage() {
     if (!googleEnabled) return [];
     return googleAllEvents.filter(ev => dayjs(ev.start).format('YYYY-MM-DD') === selectedDate);
   }, [googleAllEvents, selectedDate, googleEnabled]);
-
-  const changeMonthJs = useCallback((direction: 'next' | 'prev') => {
-    setDisplayMonth(current =>
-      direction === 'next' ? current.add(1, 'month') : current.subtract(1, 'month')
-    );
-  }, []);
-
-  const handleSwipe = useCallback((direction: 'next' | 'prev') => {
-  }, []);
 
   const handlePageSelected = useCallback(
     (e: PagerViewOnPageSelectedEvent) => {
@@ -164,14 +167,23 @@ export default function CalendarPage() {
       }
   }, [displayMonth]);
 
+  // --- 変更点：toggleViewJsをアニメーションに対応させる ---
   const toggleViewJs = () => {
-    setViewType(v => (v === 'list' ? 'full' : 'list'));
+    setViewType(v => {
+      const newType = v === 'list' ? 'full' : 'list';
+      const newHeight = getCalendarHeight(newType, displayMonth);
+      calendarHeight.value = withTiming(newHeight, { 
+        duration: 400,
+        easing: Easing.out(Easing.quad), // アニメーションの速度変化
+      });
+      return newType;
+    });
   };
 
   const toggleView = useCallback(() => {
     'worklet';
     runOnJS(toggleViewJs)();
-  }, []);
+  }, [toggleViewJs]);
 
   const flingUp = Gesture.Fling().direction(Directions.UP).onEnd(() => toggleView());
   const flingDown = Gesture.Fling().direction(Directions.DOWN).onEnd(() => toggleView());
@@ -198,6 +210,13 @@ export default function CalendarPage() {
     if (googleLoading && googleDayEvents.length === 0) {
       return <ActivityIndicator style={styles.headerItem} color={subColor} />;
     }
+    if (dayTasks.length === 0 && googleDayEvents.length === 0) {
+        return (
+            <View style={{alignItems: 'center', marginTop: 40}}>
+                <Text style={{color: '#888'}}>予定やタスクはありません</Text>
+            </View>
+        );
+    }
     if (googleDayEvents.length === 0) return null;
 
     return (
@@ -206,39 +225,55 @@ export default function CalendarPage() {
         {googleDayEvents.map(renderGoogleEvent)}
       </View>
     );
-  }, [googleDayEvents, googleLoading, subColor, renderGoogleEvent, styles]);
+  }, [googleDayEvents, dayTasks, googleLoading, subColor, renderGoogleEvent, styles]);
   
-  const textColor = isDark ? '#FFFFFF' : '#000000';
+  // SkiaCalendarのtheme propに渡す色を定義
+  const textColor = isDark ? '#EAEAEA' : '#333333';
+  const subTextColor = isDark ? '#999999' : '#777777';
+  const borderColor = isDark ? '#333333' : '#EAEAEA';
+  const dynamicSubColor = subColor || (isDark ? '#5A9CF8' : '#3A75C4');
+  
+  const skiaTheme = useMemo(() => ({
+    primary: dynamicSubColor,
+    weekday: subTextColor,
+    day: textColor,
+    saturday: SATURDAY_COLOR,
+    sunday: SUNDAY_COLOR,
+    line: borderColor,
+    background: 'transparent',
+    eventText: '#FFFFFF',
+  }), [dynamicSubColor, subTextColor, textColor, borderColor]);
+
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
        <View style={styles.appBar}>
          <Text style={styles.titleText}>{t('calendar.title')}</Text>
        </View>
-      <View style={[
+      <View style={styles.monthHeader}>
+            <Text style={styles.monthText}>
+                {displayMonth.format(t('common.year_month_format'))}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Pressable onPress={onTodayPress} style={styles.todayButton}>
+                    <Text style={styles.todayButtonText}>{t('common.today')}</Text>
+                </Pressable>
+                <Pressable onPress={toggleViewJs} style={styles.toggleButton}>
+                    <Ionicons name={viewType === 'list' ? 'list' : 'calendar-outline'} size={20} color={subTextColor} />
+                </Pressable>
+            </View>
+      </View>
+      
+      {/* --- 変更点：Animated.Viewでラップする --- */}
+      <Animated.View style={[
         styles.calendarContainer,
-        viewType === 'full' && styles.fullCalendarContainer,
+        animatedCalendarStyle,
+        viewType === 'full' ? styles.fullCalendarContainer : {},
       ]}>
-        <View style={styles.monthHeader}>
-             <Text style={styles.monthText}>
-                 {displayMonth.format(t('common.year_month_format'))}
-             </Text>
-             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                 <Pressable onPress={onTodayPress} style={styles.todayButton}>
-                     <Text style={styles.todayButtonText}>{t('common.today')}</Text>
-                 </Pressable>
-                 <Pressable onPress={toggleView} style={styles.toggleButton}>
-                     <Ionicons name={viewType === 'list' ? 'list' : 'calendar'} size={20} color="#fff" />
-                 </Pressable>
-             </View>
-        </View>
         <GestureDetector gesture={composedGesture}>
           <PagerView
             ref={pagerRef}
-            style={[
-              styles.calendarWrapper,
-              viewType === 'full' ? { flex: 1 } : { height: calendarHeight }
-            ]}
+            style={[ styles.calendarWrapper, { flex: 1 } ]}
             initialPage={1}
             onPageSelected={handlePageSelected}
             offscreenPageLimit={1}
@@ -253,16 +288,7 @@ export default function CalendarPage() {
                 groupedTasks={groupedTasks}
                 eventLayout={eventCache[prevMonth.format('YYYY-MM')] || eventLayout}
                 showTaskTitles={viewType === 'full'}
-                theme={{
-                  primary: subColor,
-                  weekday: WEEKDAY_COLOR,
-                  day: textColor,
-                  saturday: SATURDAY_COLOR,
-                  sunday: SUNDAY_COLOR,
-                  line: isDark ? '#303030' : '#B0B0B5',
-                  background: isDark ? '#000000' : '#FFFFFF',
-                  eventText: '#FFFFFF',
-                }}
+                theme={skiaTheme}
               />
             </View>
             <View key="current">
@@ -275,16 +301,7 @@ export default function CalendarPage() {
                 groupedTasks={groupedTasks}
                 eventLayout={eventLayout}
                 showTaskTitles={viewType === 'full'}
-                theme={{
-                  primary: subColor,
-                  weekday: WEEKDAY_COLOR,
-                  day: textColor,
-                  saturday: SATURDAY_COLOR,
-                  sunday: SUNDAY_COLOR,
-                  line: isDark ? '#303030' : '#B0B0B5',
-                  background: isDark ? '#000000' : '#FFFFFF',
-                  eventText: '#FFFFFF',
-                }}
+                theme={skiaTheme}
               />
             </View>
             <View key="next">
@@ -297,21 +314,13 @@ export default function CalendarPage() {
                 groupedTasks={groupedTasks}
                 eventLayout={eventCache[nextMonth.format('YYYY-MM')] || eventLayout}
                 showTaskTitles={viewType === 'full'}
-                theme={{
-                  primary: subColor,
-                  weekday: WEEKDAY_COLOR,
-                  day: textColor,
-                  saturday: SATURDAY_COLOR,
-                  sunday: SUNDAY_COLOR,
-                  line: isDark ? '#303030' : '#B0B0B5',
-                  background: isDark ? '#000000' : '#FFFFFF',
-                  eventText: '#FFFFFF',
-                }}
+                theme={skiaTheme}
               />
             </View>
           </PagerView>
         </GestureDetector>
-      </View>
+      </Animated.View>
+
       {viewType === 'list' && (
         <FlatList
           data={dayTasks}
@@ -323,7 +332,7 @@ export default function CalendarPage() {
         />
       )}
       <TouchableOpacity
-        style={[styles.fab, { bottom: Platform.OS === 'ios' ? 16 : 16 }]}
+        style={styles.fab}
         onPress={() => router.push({ pathname: '/add/', params: { date: selectedDate } })}
       >
         <Ionicons name="add" size={32} color="#fff" />

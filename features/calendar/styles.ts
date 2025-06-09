@@ -24,91 +24,101 @@ export type CalendarScreenStyles = {
 };
 
 export const createCalendarStyles = (isDark: boolean, subColor: string): CalendarScreenStyles => {
-  const textColor = isDark ? '#FFFFFF' : '#000000';
-  const dynamicSubColor = subColor || (isDark ? '#4875B7' : '#2F5A8F');
+  // --- 変更点：基本色を定義 ---
+  const backgroundColor = isDark ? '#121212' : '#F8F8F8'; // 真っ黒・真っ白から変更
+  const textColor = isDark ? '#EAEAEA' : '#333333';
+  const subTextColor = isDark ? '#999999' : '#777777';
+  const cardBackgroundColor = isDark ? '#1C1C1E' : '#FFFFFF';
+  const borderColor = isDark ? '#333333' : '#EAEAEA';
+  const dynamicSubColor = subColor || (isDark ? '#5A9CF8' : '#3A75C4'); // アクセントカラー
+  // -------------------------
+
   const shadowStyle = {
-    shadowColor: isDark ? '#000' : '#555',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: isDark ? 0.25 : 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
+    shadowColor: '#000', // 影の色は黒で統一
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: isDark ? 0.25 : 0.1, // 影の濃さを調整
+    shadowRadius: 8, // 影のぼかしを広げる
+    elevation: 5,
   };
   
   return StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
+        backgroundColor: backgroundColor, // 変更
     },
     appBar: {
         height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: isDark ? '#3A3A3C' : '#D1D1D6',
+        backgroundColor: backgroundColor, // 変更
+        borderBottomWidth: 0, // 境界線を削除
     },
     titleText: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 18, // 少し小さくして上品に
+        fontWeight: '600', // boldから少し細く
         color: textColor,
     },
     monthHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 12, // 左右の余白を調整
-        paddingVertical: 8,
-        backgroundColor: isDark ? '#000000' : '#FFFFFF',
+        paddingHorizontal: 16, // 余白を広げる
+        paddingVertical: 12,
+        backgroundColor: backgroundColor, // 変更
     },
     monthText: {
-        fontSize: 22,
+        fontSize: 24, // 月の表示は大きく
         fontWeight: 'bold',
         color: textColor,
     },
+    // --- 変更点：ボタンをシンプルに ---
     todayButton: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
-        backgroundColor: dynamicSubColor,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20, // 角を丸く
+        backgroundColor: 'transparent', // 背景を透明に
+        borderWidth: 1,
+        borderColor: borderColor,
+    },
+    todayButtonText: {
+        fontWeight: '600',
+        color: subTextColor, // 文字色を落ち着いた色に
+        fontSize: 13,
     },
     toggleButton: {
         marginLeft: 8,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
-        backgroundColor: dynamicSubColor,
+        padding: 6,
+        borderRadius: 20,
+        backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA', // 背景を少しつける
     },
+    // ---------------------------------
     calendarContainer: {
         marginHorizontal: 0,
-        borderWidth: 0,
-        borderRadius: 0,
-        overflow: 'visible',
-    },
-    todayButtonText: {
-        fontWeight: 'bold',
-        color: '#FFFFFF',
+        backgroundColor: cardBackgroundColor, // 背景色を設定
+        ...shadowStyle, // 全体にうっすらと影をつける
+        shadowOffset: { width: 0, height: 6 },
     },
     calendarWrapper: {
-        backgroundColor: isDark ? '#000000' : '#FFFFFF',
-        borderTopWidth: StyleSheet.hairlineWidth,
-        borderTopColor: isDark ? '#202020' : '#888888',
+        backgroundColor: 'transparent', // 背景色を透過に
+        borderTopWidth: 1, // 曜日ヘッダーとの区切り線
+        borderTopColor: borderColor,
     },
     list: {
         flex: 1,
-        marginTop: 8,
+        marginTop: 16, // カレンダーとの余白を広げる
     },
     listContent: {
-        paddingBottom: 20,
-        paddingHorizontal: 12,
+        paddingBottom: 90, // FABと重ならないように調整
+        paddingHorizontal: 16,
     },
     headerItem: {
         marginVertical: 16,
     },
     googleHeader: {
         padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: isDark ? '#3A3A3C' : '#D1D1D6',
-        marginHorizontal: 12,
+        backgroundColor: cardBackgroundColor, // リストのヘッダーもカード風に
+        borderRadius: 12,
+        marginBottom: 8,
     },
     googleHeaderText: {
         fontWeight: 'bold',
@@ -129,21 +139,17 @@ export const createCalendarStyles = (isDark: boolean, subColor: string): Calenda
         margin: 16,
         right: 16,
         bottom: 16,
-        backgroundColor: dynamicSubColor,
+        backgroundColor: dynamicSubColor, // アクセントカラー
         width: 60,
         height: 60,
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        ...shadowStyle,
-        elevation: 6,
+        ...shadowStyle, // 影を適用
     },
     fullCalendarContainer: {
-        marginHorizontal: 0,
-        borderWidth: 0,
-        borderRadius: 0,
-        overflow: 'visible',
         flex: 1,
+        backgroundColor: cardBackgroundColor,
     },
   });
 };
