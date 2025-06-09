@@ -82,19 +82,19 @@ export default function FocusModeOverlay({
         <View style={styles.controls}>
           {focusModeStatus === 'running' ? (
             <TouchableOpacity onPress={onPause} style={styles.controlButton}>
-              <Text style={styles.controlText}>{t('growth.pause')}</Text>
+              <Ionicons name="pause" size={40} color="#fff" />
             </TouchableOpacity>
           ) : focusModeStatus === 'paused' ? (
             <TouchableOpacity onPress={onResume} style={styles.controlButton}>
-              <Text style={styles.controlText}>{t('growth.resume')}</Text>
+              <Ionicons name="play" size={40} color="#fff" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={onStart} style={styles.controlButton}>
-              <Text style={styles.controlText}>{t('growth.start_focus_mode')}</Text>
+              <Ionicons name="play" size={40} color="#fff" />
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={onStop} style={styles.controlButton}>
-            <Text style={styles.controlText}>{t('growth.end')}</Text>
+            <Ionicons name="stop" size={40} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -126,11 +126,6 @@ const styles = StyleSheet.create({
   },
   controlButton: {
     padding: 10,
-  },
-  controlText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   audioButton: {
     position: 'absolute',
