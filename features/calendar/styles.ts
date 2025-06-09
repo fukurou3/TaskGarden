@@ -25,7 +25,7 @@ export type CalendarScreenStyles = {
 
 export const createCalendarStyles = (isDark: boolean, subColor: string): CalendarScreenStyles => {
   // --- 変更点：基本色を定義 ---
-  const backgroundColor = isDark ? '#121212' : '#F8F8F8'; // 真っ黒・真っ白から変更
+  const backgroundColor = isDark ? '#0C0C0C' : '#f2f2f4'; // 真っ黒・真っ白から変更
   const textColor = isDark ? '#EAEAEA' : '#333333';
   const subTextColor = isDark ? '#999999' : '#777777';
   const cardBackgroundColor = isDark ? '#1C1C1E' : '#FFFFFF';

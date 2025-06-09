@@ -79,13 +79,13 @@ export const createStyles = (isDark: boolean, subColor: string, fontSizeKey: Fon
  return StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
+        backgroundColor: isDark ? '#0C0C0C' : '#f2f2f4',
     },
     appBar: {
         height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
+        backgroundColor: isDark ? '#0C0C0C' : '#f2f2f4',
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: isDark ? '#3A3A3C' : '#D1D1D6',
     },
@@ -100,7 +100,7 @@ export const createStyles = (isDark: boolean, subColor: string, fontSizeKey: Fon
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingVertical: 10,
-        backgroundColor: isDark ? '#000000' : '#f2f2f4',
+        backgroundColor: isDark ? '#0C0C0C' : '#f2f2f4',
     },
     segmentedControlContainer: {
         flexDirection: 'row',
@@ -337,7 +337,7 @@ export const createStyles = (isDark: boolean, subColor: string, fontSizeKey: Fon
     },
     folderTabsContainer: {
         flexDirection: 'row',
-        backgroundColor: isDark ? '#000000' : '#f2f2f4', // AppBar と同じ背景色に変更
+        backgroundColor: isDark ? '#0C0C0C' : '#f2f2f4', // AppBar と同じ背景色に変更
         paddingHorizontal: 12, // 左右に少しパディング
         paddingTop: 8,
         paddingBottom: 0, // 下線を見せるため
