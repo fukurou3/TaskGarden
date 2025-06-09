@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import WheelPicker from 'react-native-wheely';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -67,10 +68,10 @@ export default function DurationPickerModal({
         </View>
         <View style={styles.buttonRow}>
           <Pressable style={styles.button} onPress={onConfirm}>
-            <Text style={[styles.buttonText, { color: textColor }]}>{t('growth.start_focus_mode')}</Text>
+            <Ionicons name="play" size={36} color={textColor} />
           </Pressable>
           <Pressable style={styles.button} onPress={onClose}>
-            <Text style={[styles.buttonText, { color: textColor }]}>{t('growth.end')}</Text>
+            <Ionicons name="stop" size={36} color={textColor} />
           </Pressable>
         </View>
       </Pressable>
@@ -83,7 +84,6 @@ const styles = StyleSheet.create({
   container: { padding: 0, backgroundColor: 'transparent' },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginVertical: 10 },
   label: { marginHorizontal: 5, fontSize: 16 },
-  buttonRow: { flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 10 },
+  buttonRow: { flexDirection: 'row', justifyContent: 'center', gap: 40, marginTop: 10 },
   button: { paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center' },
-  buttonText: { fontSize: 16, fontWeight: 'bold' },
 });

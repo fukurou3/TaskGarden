@@ -132,7 +132,8 @@ export default function GrowthScreen() {
 
 
 
-  const startFocusMode = useCallback(() => {
+  const startFocusMode = useCallback((duration?: number) => {
+    const focusSec = duration ?? focusDurationSec;
     startTimeRef.current = Date.now();
     if (notificationIdRef.current) {
       Notifications.cancelScheduledNotificationAsync(notificationIdRef.current).catch(() => {});
@@ -142,17 +143,17 @@ export default function GrowthScreen() {
       content: {
         title: t('growth.focus_mode_completed_title'),
         body: t('growth.focus_mode_completed_message', {
-          minutes: Math.ceil(focusDurationSec / 60),
-          points: Math.ceil(focusDurationSec / 60) * GROWTH_POINTS_PER_FOCUS_MINUTE,
+          minutes: Math.ceil(focusSec / 60),
+          points: Math.ceil(focusSec / 60) * GROWTH_POINTS_PER_FOCUS_MINUTE,
         }),
       },
-      trigger: { seconds: focusDurationSec, repeats: false },
+      trigger: { seconds: focusSec, repeats: false },
     }).then((id) => {
       notificationIdRef.current = id;
     });
     setFocusModeActive(true);
     setFocusModeStatus('running');
-    setTimeRemaining(focusDurationSec);
+    setTimeRemaining(focusSec);
   }, [focusDurationSec, t]);
 
   const showDurationPicker = useCallback(() => {
@@ -162,6 +163,8 @@ export default function GrowthScreen() {
     setTempHours(hours);
     setTempMinutes(minutes);
     setTempSeconds(seconds);
+    setFocusModeActive(true);
+    setFocusModeStatus('idle');
     setDurationPickerVisible(true);
   }, [focusDurationSec]);
 
@@ -170,9 +173,8 @@ export default function GrowthScreen() {
     setFocusDurationSec(totalSec);
     setTimeRemaining(totalSec);
     setDurationPickerVisible(false);
-    setFocusModeActive(true);
-    setFocusModeStatus('idle');
-  }, [tempHours, tempMinutes, tempSeconds]);
+    startFocusMode(totalSec);
+  }, [tempHours, tempMinutes, tempSeconds, startFocusMode]);
 
   const pauseFocusMode = useCallback(() => {
     if (timerIntervalRef.current !== null) {
@@ -205,6 +207,20 @@ export default function GrowthScreen() {
     setFocusModeStatus('running');
   }, [timeRemaining, focusDurationSec, t]);
 
+  const cancelTimer = useCallback(() => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+    if (notificationIdRef.current) {
+      Notifications.cancelScheduledNotificationAsync(notificationIdRef.current).catch(() => {});
+      notificationIdRef.current = null;
+    }
+    setFocusModeStatus('idle');
+    setDurationPickerVisible(true);
+    setTimeRemaining(focusDurationSec);
+  }, [focusDurationSec]);
+
   const toggleMute = useCallback(() => {
     setMuted(prev => !prev);
   }, []);
@@ -220,6 +236,7 @@ export default function GrowthScreen() {
     }
     setFocusModeStatus('idle');
     setFocusModeActive(false);
+    setDurationPickerVisible(false);
     setTimeRemaining(focusDurationSec);
   }, [focusDurationSec]);
 
@@ -274,7 +291,7 @@ export default function GrowthScreen() {
 
 
       <FocusModeOverlay
-        visible={isFocusModeActive}
+        visible={isFocusModeActive && !isDurationPickerVisible}
         width={width}
         subColor={subColor}
         isDark={isDark}
@@ -286,7 +303,7 @@ export default function GrowthScreen() {
         onStart={startFocusMode}
         onPause={pauseFocusMode}
         onResume={resumeFocusMode}
-        onStop={stopFocusMode}
+        onStop={cancelTimer}
         onToggleMute={toggleMute}
       />
 
@@ -316,7 +333,7 @@ export default function GrowthScreen() {
         onChangeMinutes={setTempMinutes}
         onChangeSeconds={setTempSeconds}
         onConfirm={confirmDurationPicker}
-        onClose={() => setDurationPickerVisible(false)}
+        onClose={stopFocusMode}
         textColor="#fff"
       />
 
@@ -324,30 +341,18 @@ export default function GrowthScreen() {
         <TouchableOpacity onPress={toggleMute} style={styles.bottomActionButton}>
           <Ionicons name={isMuted ? 'volume-mute' : 'musical-notes'} size={24} color={tabIconColor} />
         </TouchableOpacity>
-        {focusModeStatus === 'idle' && (
-          <TouchableOpacity onPress={showDurationPicker} style={styles.focusModeToggleButton}>
-            <Text style={[styles.focusModeToggleText, { color: subColor }]}>{t('growth.start_focus_mode')}</Text>
-          </TouchableOpacity>
-        )}
-        {focusModeStatus === 'running' && (
-          <TouchableOpacity onPress={pauseFocusMode} style={styles.focusModeToggleButton}>
-            <Text style={[styles.focusModeToggleText, { color: subColor }]}>{t('growth.pause')}</Text>
-          </TouchableOpacity>
-        )}
-        {focusModeStatus === 'paused' && (
-          <TouchableOpacity onPress={resumeFocusMode} style={styles.focusModeToggleButton}>
-            <Text style={[styles.focusModeToggleText, { color: subColor }]}>{t('growth.resume')}</Text>
-          </TouchableOpacity>
-        )}
-        {focusModeStatus !== 'idle' && !isViewMode && (
-          <TouchableOpacity onPress={stopFocusMode} style={styles.focusModeToggleButton}>
-            <Text style={[styles.focusModeToggleText, { color: subColor }]}>{t('growth.end')}</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          onPress={isFocusModeActive ? stopFocusMode : showDurationPicker}
+          style={styles.focusModeToggleButton}
+        >
+          <Text style={[styles.focusModeToggleText, { color: subColor }]}> 
+            {isFocusModeActive ? t('growth.focus_mode_button_stop') : t('growth.focus_mode_button_start')} 
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
           style={styles.bottomActionButton}
-          disabled={focusModeStatus === 'running' || focusModeStatus === 'paused'}
+          disabled={isFocusModeActive}
         >
           <Ionicons name="menu" size={24} color={tabIconColor} />
         </TouchableOpacity>
