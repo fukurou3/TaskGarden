@@ -117,6 +117,7 @@ function InnerTabs() {
             'growth/store',
             'growth/dictionary',
             'index',
+            'two',
           ].map((name) => (
             <Tabs.Screen key={name} name={name} options={{ href: null }} />
           ))}
