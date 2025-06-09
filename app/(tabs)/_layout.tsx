@@ -29,7 +29,8 @@ function InnerTabs() {
   const inactiveColor = isDark ? '#CCCCCC' : '#000000';
   
   // 2. screenOptionsに渡す関数をuseCallbackでラップします
-  const screenOptions = useCallback(({ route }) => {
+  const screenOptions = useCallback(
+    ({ route }: { route: RouteProp<ParamListBase, string> }): BottomTabNavigationOptions => {
     return {
       headerShown: false,
       tabBarStyle: {
