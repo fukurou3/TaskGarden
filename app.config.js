@@ -1,4 +1,7 @@
-{
+import 'dotenv/config'; // .envファイルを読み込むために追加
+
+export default {
+
   "expo": {
     "name": "TaskGarden",
     "slug": "TaskGarden",
@@ -12,6 +15,11 @@
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
+    },
+    "config": {
+        "googleSignIn": {
+          "clientId": process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID
+        }
     },
     "ios": {
       "supportsTablet": true
