@@ -209,11 +209,22 @@ export default function AddTaskScreen() {
            customUnit !== initialFormState.customUnit)
         );
     }
-    setUnsaved(formChanged);
+    if (unsaved !== formChanged) {
+      setUnsaved(formChanged);
+    }
   }, [
-    title, memo, selectedUris, folder, currentDeadlineSettings,
-    notificationActive, customAmount, customUnit,
-    initialFormState, currentDraftId, setUnsaved
+    title,
+    memo,
+    selectedUris,
+    folder,
+    currentDeadlineSettings,
+    notificationActive,
+    customAmount,
+    customUnit,
+    initialFormState,
+    currentDraftId,
+    unsaved,
+    setUnsaved,
   ]);
 
 

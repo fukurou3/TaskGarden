@@ -114,8 +114,22 @@ export default function EditTaskScreen() {
       notificationActive !== originalTask.notifyEnabled ||
       customUnit !== originalTask.customUnit ||
       customAmount !== originalTask.customAmount;
-    setUnsaved(changed);
-  }, [title, memo, selectedUris, folder, currentDeadlineSettings, notificationActive, customUnit, customAmount, originalTask, setUnsaved]);
+    if (unsaved !== changed) {
+      setUnsaved(changed);
+    }
+  }, [
+    title,
+    memo,
+    selectedUris,
+    folder,
+    currentDeadlineSettings,
+    notificationActive,
+    customUnit,
+    customAmount,
+    originalTask,
+    unsaved,
+    setUnsaved,
+  ]);
 
   useEffect(() => {
     const unsub = navigation.addListener('beforeRemove', (e:any) => {
